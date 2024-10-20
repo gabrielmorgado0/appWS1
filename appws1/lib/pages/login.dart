@@ -1,15 +1,46 @@
+// lib/tela_login.dart
 import 'package:appws1/pages/cadastro.dart';
 import 'package:flutter/material.dart';
+import 'package:appws1/biometria_service.dart';
 import 'perfil.dart';
 
-class TelaLogin extends StatelessWidget {
+class TelaLogin extends StatefulWidget {
   const TelaLogin({super.key});
+
+  @override
+  _TelaLoginState createState() => _TelaLoginState();
+}
+
+class _TelaLoginState extends State<TelaLogin> {
+  final BiometriaService biometriaService = BiometriaService();
+
+  @override
+  void initState() {
+    super.initState();
+    _autenticarBiometria();
+  }
+
+  Future<void> _autenticarBiometria() async {
+    bool autenticado = await biometriaService.autenticar();
+    if (autenticado) {
+      // Se a autenticação for bem-sucedida, navegue automaticamente para a tela de perfil
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const TelaPerfil()),
+      );
+    } else {
+      // Caso falhe, mostre uma mensagem e continue na mesma página
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Autenticação falhou'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         leading: IconButton(
           onPressed: () {},
           icon: const Icon(Icons.arrow_back),
@@ -46,22 +77,19 @@ class TelaLogin extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                SizedBox(height: 70),
-                
+                const SizedBox(height: 70),
                 ElevatedButton(
                   onPressed: () {
+                    // Navega para a TelaPerfil sem autenticação biométrica
                     Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const TelaPerfil())
+                      MaterialPageRoute(builder: (context) => const TelaPerfil()),
                     );
                   },
-                  child: Text("Entrar"),
-                  
+                  child: const Text("Entrar"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                   ),
-                )
-
+                ),
               ],
             ),
           ),
